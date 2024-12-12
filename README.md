@@ -110,47 +110,43 @@ python spark_processor.py
 
 ```mermaid
 graph LR
-    subgraph Producers
+    subgraph "Producers"
         java[Java]
         python[Python]
     end
 
-    subgraph "Data Pipeline"
+    subgraph "Kafka Ecosystem"
+        kc[Kafka Controllers]
+        kb[Kafka Brokers]
         sr[Schema Registry]
-        
-        subgraph "Kafka"
-            kc[Kafka Controllers]
-            kb[Kafka Brokers]
-        end
-
-        subgraph "Processing"
-            master[Spark Master]
-            w1[Worker]
-            w2[Worker]
-            w3[Worker]
-        end
     end
 
-    subgraph "Analytics & Storage"
-        kibana[Kibana]
+    subgraph "Processing"
+        master[Spark Master]
+        w1[Worker]
+        w2[Worker]
+        w3[Worker]
+    end
+
+    subgraph "Analytics Stack"
+        es[Elasticsearch]
         logstash[Logstash]
-    end
-
-    subgraph "Monitoring"
-        mon[MONITORING]
+        kibana[Kibana]
     end
 
     %% Connections
-    java -- Streaming --> kb
-    python -- Streaming --> kb
-    sr --> kb
+    java -- Streaming --> kc
+    python -- Streaming --> kc
+    kc -- Streaming --> kb
+    kb --> sr
     kb -- Streaming --> master
     master --> w1
     master --> w2
     master --> w3
-    w1 -- Streaming --> logstash
-    w2 -- Streaming --> logstash
-    w3 -- Streaming --> logstash
+    w1 --> es
+    w2 --> es
+    w3 --> es
+    es --> logstash
     logstash --> kibana
 ```
 
